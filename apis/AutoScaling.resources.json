@@ -1,0 +1,100 @@
+{
+  "resources": {
+    "Group": {
+      "identifiers": [
+        {
+          "name": "Name",
+          "memberName": "AutoScalingGroupName"
+        }
+      ],
+      "shape": "AutoScalingGroup",
+      "load": {
+        "request": {
+          "operation": "DescribeAutoScalingGroups",
+          "params": [
+            {
+              "target": "AutoScalingGroupNames[0]",
+              "source": "identifier",
+              "name": "Name"
+            }
+          ]
+        },
+        "path": "AutoScalingGroups[0]"
+      },
+      "actions": {
+        "Delete": {
+          "request": {
+            "operation": "DeleteAutoScalingGroup",
+            "params": [
+              {
+                "target": "AutoScalingGroupName",
+                "source": "identifier",
+                "name": "Name"
+              }
+            ]
+          }
+        },
+        "ResumeProcesses":{
+          "request": {
+            "operation": "ResumeProcesses",
+            "params": [
+              {
+                "target": "AutoScalingGroupName",
+                "source": "identifier",
+                "name": "Name"
+              }
+            ]
+          }
+        },
+        "SuspendProcesses": {
+          "request": {
+            "operation": "SuspendProcesses",
+            "params": [
+              {
+                "target": "AutoScalingGroupName",
+                "source": "identifier",
+                "name": "Name"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "Instance": {
+      "identifiers": [
+        {
+          "name": "Id",
+          "memberName": "InstanceId"
+        }
+      ],
+      "shape": "Instance",
+      "load": {
+        "request": {
+          "operation": "DescribeAutoScalingInstances",
+          "params": [
+            {
+              "target": "InstanceIds[0]",
+              "source": "identifier",
+              "name": "Id"
+            }
+          ]
+        },
+        "path": "AutoScalingInstances[0]"
+      },
+      "actions": {
+        "Terminate": {
+          "request": {
+            "operation": "TerminateInstanceInAutoScalingGroup",
+            "params": [
+              {
+                "target": "InstanceId",
+                "source": "identifier",
+                "name": "Id"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

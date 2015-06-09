@@ -5,12 +5,7 @@ module Cloudat
       class InstanceResource < Cloudat::Resource::BaseResource
         Resource.register(self, :start, :stop, :terminate)
 
-        attr_accessor :id, :subnet, :security_group
-
-        def initialize(config, *args)
-          @id = args[0] if args.length == 1
-          super(config, *args)
-        end
+        attr_accessor :subnet, :security_group
 
         def start
           puts "Instance #{@id} has started"

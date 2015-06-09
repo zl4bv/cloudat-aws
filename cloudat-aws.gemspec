@@ -23,4 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec'
 
   spec.add_dependency 'cloudat'
+  spec.add_dependency 'aws-sdk', '~> 2'
 end

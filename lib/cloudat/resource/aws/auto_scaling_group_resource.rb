@@ -2,17 +2,19 @@ module Cloudat
   module Resource
     module Aws
       # Resource for an AWS Auto-scaling group
-      class AutoscaleGroupResource < Cloudat::Resource::BaseResource
+      class AutoScalingGroupResource < Cloudat::Resource::BaseResource
         Resource.register(self, :suspend, :resume)
 
-        attr_accessor :id
+        def group
+          @group ||= ::Aws::AutoScaling::Group.new(identifier)
+        end
 
         def suspend
-          puts "Auto-scale group #{@id} has been suspended"
+          group.suspend_processes
         end
 
         def resume
-          puts "Auto-scale group #{@id} has been resumed"
+          group.resume_processes
         end
       end
     end
