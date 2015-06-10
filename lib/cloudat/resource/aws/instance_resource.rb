@@ -7,16 +7,44 @@ module Cloudat
 
         attr_accessor :subnet, :security_group
 
+        # @return [Aws::EC2::Instance] Instance object representing the
+        #   EC2 instance
+        def instance
+          @instance ||= ::Aws::EC2::Instance.new(identifier)
+        end
+
+        # Starts the instance if was previously stopped. Only applicable to
+        # Amazon EBS-backed instances.
+        # @return [Struct] Calls {Aws::EC2::Instance#stop}, returning
+        #   its response.
         def start
-          puts "Instance #{@id} has started"
+          response = instance.start
+          logger.info("Instance #{identifier} has started")
+          response
+        rescue ::Aws::EC2::Errors::ServiceError => e
+          logger.error("Failed to start instance #{identifier}: #{e.message}")
         end
 
+        # Stops the instance. Only applicable to Amazon EBS-backed instances.
+        # @return [Struct] Calls {Aws::EC2::Instance#stop}, returning
+        #   its response.
         def stop
-          puts "Instance #{@id} has stopped"
+          response = instance.stop
+          logger.info("Instance #{identifier} has stopped")
+          response
+        rescue ::Aws::EC2::Errors::ServiceError => e
+          logger.error("Failed to start instance #{identifier}: #{e.message}")
         end
 
+        # Shuts down the instance. The root device and any other devices
+        # attached during the instance launch are automatically deleted.
+        # @return [Struct] Calls {Aws::EC2::Instance#terminate}, returning
+        #   its response.
         def terminate
-          puts "Instance #{@id} has terminated"
+          instance.terminate
+          logger.info("Instance #{identifier} has terminated")
+        rescue ::Aws::EC2::Errors::ServiceError => e
+          logger.error("Failed to start instance #{identifier}: #{e.message}")
         end
       end
     end
