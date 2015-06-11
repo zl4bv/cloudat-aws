@@ -3,8 +3,6 @@ module Cloudat
     module Aws
       # Resource for an AWS EC2 instance
       class InstanceResource < Cloudat::Resource::BaseResource
-        Resource.register(self, :start, :stop, :terminate)
-
         attr_accessor :subnet, :security_group
 
         # @return [Aws::EC2::Instance] Instance object representing the
@@ -17,7 +15,7 @@ module Cloudat
         # Amazon EBS-backed instances.
         # @return [Struct] Calls {Aws::EC2::Instance#stop}, returning
         #   its response.
-        def start
+        def action_start
           response = instance.start
           logger.info("Instance #{identifier} has started")
           response
@@ -28,7 +26,7 @@ module Cloudat
         # Stops the instance. Only applicable to Amazon EBS-backed instances.
         # @return [Struct] Calls {Aws::EC2::Instance#stop}, returning
         #   its response.
-        def stop
+        def action_stop
           response = instance.stop
           logger.info("Instance #{identifier} has stopped")
           response
@@ -40,12 +38,14 @@ module Cloudat
         # attached during the instance launch are automatically deleted.
         # @return [Struct] Calls {Aws::EC2::Instance#terminate}, returning
         #   its response.
-        def terminate
+        def action_terminate
           instance.terminate
           logger.info("Instance #{identifier} has terminated")
         rescue ::Aws::EC2::Errors::ServiceError => e
           logger.error("Failed to start instance #{identifier}: #{e.message}")
         end
+
+        Resource.register(self)
       end
     end
   end
