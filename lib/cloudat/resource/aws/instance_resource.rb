@@ -26,10 +26,10 @@ module Cloudat
         #   its response.
         def action_start
           response = instance.start
-          logger.info("Instance #{identifier} has started")
+          logger.info("Started #{self}")
           response
         rescue ::Aws::EC2::Errors::ServiceError => e
-          logger.error("Failed to start instance #{identifier}: #{e.message}")
+          logger.error("Failed to start instance #{self}: #{e.message}")
         end
 
         # Stops the instance. Only applicable to Amazon EBS-backed instances.
@@ -37,10 +37,10 @@ module Cloudat
         #   its response.
         def action_stop
           response = instance.stop
-          logger.info("Instance #{identifier} has stopped")
+          logger.info("Stopped #{self}")
           response
         rescue ::Aws::EC2::Errors::ServiceError => e
-          logger.error("Failed to start instance #{identifier}: #{e.message}")
+          logger.error("Failed to start instance #{self}: #{e.message}")
         end
 
         # Shuts down the instance. The root device and any other devices
@@ -49,9 +49,18 @@ module Cloudat
         #   its response.
         def action_terminate
           instance.terminate
-          logger.info("Instance #{identifier} has terminated")
+          logger.info("Terminated #{self}")
         rescue ::Aws::EC2::Errors::ServiceError => e
-          logger.error("Failed to start instance #{identifier}: #{e.message}")
+          logger.error("Failed to start instance #{self}: #{e.message}")
+        end
+
+        def to_s
+          name = tag('Name')
+          if name # Add the name tag if it exists
+            "#{super} (#{name})"
+          else
+            super
+          end
         end
 
         Resource.register(self)
@@ -76,6 +85,13 @@ module Cloudat
             instances << new(config, instance.id)
           end
           instances
+        end
+
+        def tag(key)
+          instance.tags.each do |tag|
+            return tag.value if tag.key == key
+          end
+          nil
         end
       end
     end
