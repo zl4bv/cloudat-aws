@@ -5,6 +5,15 @@ module Cloudat
       class InstanceResource < Cloudat::Resource::BaseResource
         attr_accessor :subnet, :security_group
 
+        # @see Cloudat::Resource::BaseResource.builder
+        def self.builder(config, *options)
+          if options.length > 0 && options.first.is_a?(Regexp)
+            find_by_identifer(config, options.first)
+          else
+            find_by_filters(config, *options)
+          end
+        end
+
         # @return [Aws::EC2::Instance] Instance object representing the
         #   EC2 instance
         def instance
@@ -46,6 +55,28 @@ module Cloudat
         end
 
         Resource.register(self)
+
+        private
+
+        def self.find_by_identifer(config, regexp)
+          instances = []
+          res = ::Aws::EC2::Resource.new
+          res.instances.each do |instance|
+            instances << new(config, instance.id) if instance.id =~ regexp
+          end
+          instances
+        end
+
+        def self.find_by_filters(config, *options)
+          filters = Cloudat::Aws::Filters.builder(options.first)
+          options = { filters: filters } if options.length > 0
+          instances = []
+          res = ::Aws::EC2::Resource.new
+          res.instances(options).each do |instance|
+            instances << new(config, instance.id)
+          end
+          instances
+        end
       end
     end
   end
