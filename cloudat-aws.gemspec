@@ -24,6 +24,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'guard', '~> 2.13'
   spec.add_development_dependency 'guard-rspec'
 
+
   spec.add_dependency 'cloudat'
+  spec.add_dependency 'activesupport'
   spec.add_dependency 'aws-sdk', '~> 2.0'
 end
