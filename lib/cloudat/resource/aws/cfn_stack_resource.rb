@@ -10,7 +10,7 @@ module Cloudat
 
         # @see Cloudat::Resource::BaseResource.builder
         def self.builder(config, *options)
-          stacks = find_cfn_stacks(config, options)
+          stacks = find_cfn_stacks(config, *options)
           stacks.map do |stack|
             CfnStackResource.from_stack_id(config, stack.stack_id)
           end
@@ -24,7 +24,7 @@ module Cloudat
           puts "Destroying Clouformation stacks #{identifier}"
           stack = CfnStackResource.resource.stack(identifier)
           fail ArgumentError, "Error fetching stack #{identifier}" unless stack
-          stack.delete
+          #stack.delete
         end
 
         Resource.register(self)
@@ -43,14 +43,14 @@ module Cloudat
         # @option options [RegExp] :matching Find stacks matching a RegExp
         # @return [Array<Cloudat::Resource::CfnStackResource] List of cfn stacks
         #    that match the array
-        def self.find_cfn_stacks(config, *options)
+        def self.find_cfn_stacks(config, options)
           # If a full stack id is provided, return it
-          return find_stack(*options) if unique_stack_id?(*options)
+          return find_stack(*options) if unique_stack_id?(options)
 
           # Unfortunately the AWS SDK doesn't provide filters, so we have to
           # iterate through all the stacks
           stacks = resource.stacks.select do |stack|
-            selected?(stack, *options)
+            selected?(stack, options)
           end
 
           [stacks].flatten
@@ -64,7 +64,6 @@ module Cloudat
 
         # Indicates if a the {options} uniquely identify a stack
         def self.unique_stack_id?(options)
-          options = options.first if options.respond_to? :first
           unique_identifiers.any? do |identifier|
             options.keys.include?(identifier) && options[identifier].is_a?(String)
           end
@@ -72,7 +71,7 @@ module Cloudat
 
         # Indicates if a stack matches the criteria
         def self.selected?(stack, options)
-          options.first.all? do |pair|
+          options.all? do |pair|
             matches?(stack, pair.first, pair.last)
           end
         end

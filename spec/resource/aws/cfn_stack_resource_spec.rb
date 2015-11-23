@@ -2,28 +2,32 @@ require 'cloudat'
 require 'cloudat/resource/aws/cfn_stack_resource'
 
 describe Cloudat::Resource::Aws::CfnStackResource do
-  let(:stack_resource) do
-    Cloudat::Resource::Aws::CfnStackResource.new('config',
-                                                 'test-id')
-  end
   let(:stack) { double('Aws::CloudFormation::Stack') }
 
-  describe '#find' do
+  describe '#find_cfn_stacks' do
     context 'when called with a stack name' do
-      subject { stack_resource.find(nil, stack_name: 'test_stack') }
+      subject do
+        Cloudat::Resource::Aws::CfnStackResource.find_cfn_stacks(nil,
+                                                      stack_name: 'test_stack')
+      end
 
       it 'is expected to use the optimized method of the aws sdk' do
-        expect(stack_resource).to receive(:find_stack)
+        expect(Cloudat::Resource::Aws::CfnStackResource).to receive(:find_stack)
+        subject
       end
     end
 
     context 'when called with a Regexp' do
-      subject { stack_resource.find(nil, stack_name: /test_stack/) }
+      subject do
+        Cloudat::Resource::Aws::CfnStackResource.find_cfn_stacks(nil,
+                                                                 stack_name: /test_stack/)
+      end
 
       it 'is expected to return a list of Stacks' do
-        expect(stack_resource).to receive_message_chain(:resource, :stacks).and_return [stack]
-        expect(stack_resource).to receive(:unique_stack_id?).and_return false
-        expect(stack_resource).to receive(:selected?).and_return true
+        expect(Cloudat::Resource::Aws::CfnStackResource).to receive_message_chain(:resource, :stacks)
+          .and_return [stack]
+        expect(Cloudat::Resource::Aws::CfnStackResource).to receive(:unique_stack_id?).and_return false
+        expect(Cloudat::Resource::Aws::CfnStackResource).to receive(:selected?).and_return true
 
         expect(subject).to include stack
       end
@@ -33,55 +37,47 @@ describe Cloudat::Resource::Aws::CfnStackResource do
   describe '#unique_stack_id?' do
     context 'when called with :stack_name and a string' do
       subject do
-        stack_resource.send(:unique_stack_id?,
-                            stack_name: 'test'
-                           )
+        Cloudat::Resource::Aws::CfnStackResource.unique_stack_id? stack_name: 'test'
       end
       it { is_expected.to be true }
     end
 
     context 'when called with :stack_name and a Regexp' do
       subject do
-        stack_resource.send(:unique_stack_id?,
-                            stack_name: /test/
-                           )
+        Cloudat::Resource::Aws::CfnStackResource.unique_stack_id? stack_name: /test/
       end
       it { is_expected.to be false }
     end
 
     context 'when called with :stack_id and a string' do
       subject do
-        stack_resource.send(:unique_stack_id?,
-                            stack_id: 'test'
-                           )
+        Cloudat::Resource::Aws::CfnStackResource.unique_stack_id? stack_id: 'test'
       end
       it { is_expected.to be true }
     end
 
     context 'when called with :stack_id and a Regexp' do
       subject do
-        stack_resource.send(:unique_stack_id?,
-                            stack_id: /test/
-                           )
+        Cloudat::Resource::Aws::CfnStackResource.unique_stack_id? stack_id: /test/
       end
       it { is_expected.to be false }
     end
 
     context 'when called with :stack_fake_param and a String' do
       subject do
-        stack_resource.send(:unique_stack_id?,
-                            stack_fake_param: /test/
-                           )
+        Cloudat::Resource::Aws::CfnStackResource.unique_stack_id? stack_fake_param: /test/
       end
       it { is_expected.to be false }
     end
   end
 
   describe '#selected?' do
-    subject { stack_resource.send(:selected?, stack, stack_name: /test/) }
+    subject do
+      Cloudat::Resource::Aws::CfnStackResource.selected? stack, stack_name: /test/
+    end
 
     before do
-      expect(stack_resource).to receive(:matches?)
+      expect(Cloudat::Resource::Aws::CfnStackResource).to receive(:matches?)
         .with(stack, :stack_name, /test/).and_return does_stack_exist
     end
 
@@ -100,7 +96,10 @@ describe Cloudat::Resource::Aws::CfnStackResource do
 
   describe '#matches?' do
     context 'when called with stack_name' do
-      subject { stack_resource.send(:matches?, stack, :stack_name, /good/) }
+      subject do
+        Cloudat::Resource::Aws::CfnStackResource.matches? stack, :stack_name, /good/
+      end
+
       before do
         expect(stack).to receive(:stack_name).and_return stack_name
       end
