@@ -1,4 +1,4 @@
-require 'active_record'
+require 'active_support/core_ext/object/blank.rb'
 require 'aws-sdk'
 
 module Cloudat
@@ -14,13 +14,16 @@ module Cloudat
         end
 
         def action_create
-          puts "Creating #{identifier}"
-          stacks = CfnStackResource.builder(nil, identifier)
-          puts "CloudFormation stack #{@name} created"
+          fail NotImplementedError
         end
 
         def action_destroy
-          puts "CloudFormation stack #{@name} destroyed"
+          puts "Destroying Clouformation stacks matching #{identifier}"
+          stacks = CfnStackResource.builder(nil, identifier)
+          stacks.each do |stack|
+            puts "Destroying CloudFormation stack #{stack.name}"
+            stack.delete
+          end
         end
 
         Resource.register(self)
