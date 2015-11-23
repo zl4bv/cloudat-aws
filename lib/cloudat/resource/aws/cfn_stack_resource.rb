@@ -51,22 +51,23 @@ module Cloudat
           [stacks].flatten
         end
 
+        # List the {Aws::CloudFormation::Stack} properties that can be used
+        # to uniquely identify a stack
         def self.unique_identifiers
           [:stack_id, :stack_name]
         end
 
-        # Indicates if a {param} in {options} uniquely identifies a stack
+        # Indicates if a the {options} uniquely identify a stack
         def self.unique_stack_id?(options)
           options = options.first if options.respond_to? :first
           unique_identifiers.any? do |identifier|
             options.keys.include?(identifier) && options[identifier].is_a?(String)
           end
         end
+
         # Indicates if a stack matches the criteria
         def self.selected?(stack, options)
           options.first.all? do |pair|
-            puts "Pair: #{pair}"
-
             matches?(stack, pair.first, pair.last)
           end
         end
