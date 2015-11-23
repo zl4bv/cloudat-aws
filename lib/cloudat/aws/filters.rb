@@ -1,5 +1,6 @@
 module Cloudat
   module Aws
+    # Format Filters for AWS resources
     class Filters
       # Builds an array of aws-sdk ready filters from a hash of filters
       # @param options [Hash] Hash of filters to be turned into an array

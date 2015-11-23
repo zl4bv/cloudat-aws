@@ -8,7 +8,7 @@ describe Cloudat::Resource::Aws::CfnStackResource do
     context 'when called with a stack name' do
       subject do
         Cloudat::Resource::Aws::CfnStackResource.find_cfn_stacks(nil,
-                                                      stack_name: 'test_stack')
+                                                                 stack_name: 'test_stack')
       end
 
       it 'is expected to use the optimized method of the aws sdk' do
@@ -24,10 +24,15 @@ describe Cloudat::Resource::Aws::CfnStackResource do
       end
 
       it 'is expected to return a list of Stacks' do
-        expect(Cloudat::Resource::Aws::CfnStackResource).to receive_message_chain(:resource, :stacks)
-          .and_return [stack]
-        expect(Cloudat::Resource::Aws::CfnStackResource).to receive(:unique_stack_id?).and_return false
-        expect(Cloudat::Resource::Aws::CfnStackResource).to receive(:selected?).and_return true
+        expect(Cloudat::Resource::Aws::CfnStackResource).to(
+          receive_message_chain(:resource, :stacks)
+          .and_return [stack])
+        expect(Cloudat::Resource::Aws::CfnStackResource).to(
+          receive(:unique_stack_id?)
+          .and_return false)
+        expect(Cloudat::Resource::Aws::CfnStackResource).to(
+          receive(:selected?)
+          .and_return true)
 
         expect(subject).to include stack
       end
