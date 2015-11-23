@@ -26,7 +26,7 @@ module Cloudat
           puts "Destroying Clouformation stacks #{identifier}"
           stack = CfnStackResource.resource.stack(identifier)
           fail ArgumentError, "Error fetching stack #{identifier}" unless stack
-          #stack.delete
+          stack.delete
         end
 
         Resource.register(self)
@@ -46,7 +46,7 @@ module Cloudat
         # @return [Array<Cloudat::Resource::CfnStackResource] List of cfn stacks
         #    that match the array
         def self.find_cfn_stacks(_config, options)
-          stack_helper = Cloudat::Aws::CfnStackHelper.new
+          stack_helper = options.fetch(:helper) { Cloudat::Aws::CfnStackHelper.new }
 
           # If a full stack id is provided, return it
           return find_stack(*options) if stack_helper.unique_stack_id?(options)
