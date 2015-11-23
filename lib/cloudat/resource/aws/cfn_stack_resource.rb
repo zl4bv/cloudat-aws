@@ -10,7 +10,10 @@ module Cloudat
 
         # @see Cloudat::Resource::BaseResource.builder
         def self.builder(config, *options)
-          find(config, options)
+          stacks = find_cfn_stacks(config, options)
+          stacks.map do |stack|
+            CfnStackResource.from_stack_id(config, stack.stack_id)
+          end
         end
 
         def action_create
@@ -18,12 +21,10 @@ module Cloudat
         end
 
         def action_destroy
-          puts "Destroying Clouformation stacks matching #{identifier}"
-          stacks = CfnStackResource.builder(nil, identifier)
-          stacks.each do |stack|
-            puts "Destroying CloudFormation stack #{stack.name}"
-            stack.delete
-          end
+          puts "Destroying Clouformation stacks #{identifier}"
+          stack = CfnStackResource.resource.stack(identifier)
+          fail ArgumentError, "Error fetching stack #{identifier}" unless stack
+          stack.delete
         end
 
         Resource.register(self)
@@ -32,13 +33,17 @@ module Cloudat
           ::Aws::CloudFormation::Resource.new
         end
 
+        def self.from_stack_id(config, stack_id)
+          new(config, stack_id)
+        end
+
         # Find stacks by their name, id and more
         # @param config [Cloudat::Configuration] Application configuration
         # @option options [RegExp|String] @see #find
         # @option options [RegExp] :matching Find stacks matching a RegExp
         # @return [Array<Cloudat::Resource::CfnStackResource] List of cfn stacks
         #    that match the array
-        def self.find(config, *options)
+        def self.find_cfn_stacks(config, *options)
           # If a full stack id is provided, return it
           return find_stack(*options) if unique_stack_id?(*options)
 
