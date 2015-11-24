@@ -43,7 +43,7 @@ module Cloudat
         # @option options [RegExp] :matching Find stacks matching a RegExp
         # @return [Array<Cloudat::Resource::CfnStackResource] List of cfn stacks
         #    that match the array
-        def self.find_cfn_stacks(config, options)
+        def self.find_cfn_stacks(_config, options)
           # If a full stack id is provided, return it
           return find_stack(*options) if unique_stack_id?(options)
 
