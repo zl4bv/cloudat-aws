@@ -20,7 +20,33 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Adds the following functionalities to [cloudat](https://github.com/zl4bv/cloudat):
+
+### Cloudformation stacks
+#### Actions
+  * destroy: deletes a stack
+
+#### Resources
+  * Locate a stack from its arn
+```ruby
+destroy cfn_stack '<stack arn>'
+```
+  * Locate stacks by their stack name or id using RegExps
+```ruby
+destroy cfn_stacks stack_name: /stack_nam.*/
+destroy cfn_stacks stack_id: %r{^arn:aws:cloudformation:.*:.*:stack/test-stack}
+```
+
+### EC2 instances
+#### Actions
+ * start: [Starts an EC2 instance](http://docs.aws.amazon.com/sdkforruby/api/Aws/EC2/Instance.html#start-instance_method)
+ * stop: [Stops an EC2 instance](http://docs.aws.amazon.com/sdkforruby/api/Aws/EC2/Instance.html#stop-instance_method)
+ * terminate: [Terminates an EC2 instance](http://docs.aws.amazon.com/sdkforruby/api/Aws/EC2/Instance.html#terminate-instance_method)
+
+### AutoScaling groups
+#### Actions
+ * suspend: Suspends one or more AutoScaling processes
+ * resume: Resumes one or more AutoScaling processes
 
 ## Contributing
 
