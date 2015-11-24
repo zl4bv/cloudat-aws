@@ -1,5 +1,7 @@
 # Cloudat::Aws
 
+[![Build Status](https://travis-ci.org/zl4bv/cloudat.svg?branch=master)](https://travis-ci.org/zl4bv/cloudat)
+
 AWS provider for cloudat
 
 ## Installation
@@ -45,8 +47,8 @@ destroy cfn_stacks stack_id: %r{^arn:aws:cloudformation:.*:.*:stack/test-stack}
 
 ### AutoScaling groups
 #### Actions
- * suspend: Suspends one or more AutoScaling processes
- * resume: Resumes one or more AutoScaling processes
+ * suspend: [Suspends AutoScaling processes](http://docs.aws.amazon.com/AutoScaling/latest/APIReference/API_SuspendProcesses.html)
+ * resume: [Resumes AutoScaling processes](http://docs.aws.amazon.com/AutoScaling/latest/APIReference/API_ResumeProcesses.html)
 
 ## Contributing
 
