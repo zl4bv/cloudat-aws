@@ -1,3 +1,5 @@
+require 'cloudat/aws/cfn_stack_helper'
+
 require 'active_support/core_ext/object/blank.rb'
 require 'aws-sdk'
 
@@ -24,7 +26,7 @@ module Cloudat
           puts "Destroying Clouformation stacks #{identifier}"
           stack = CfnStackResource.resource.stack(identifier)
           fail ArgumentError, "Error fetching stack #{identifier}" unless stack
-          #stack.delete
+          stack.delete
         end
 
         Resource.register(self)
@@ -44,48 +46,18 @@ module Cloudat
         # @return [Array<Cloudat::Resource::CfnStackResource] List of cfn stacks
         #    that match the array
         def self.find_cfn_stacks(_config, options)
+          stack_helper = options.fetch(:helper) { Cloudat::Aws::CfnStackHelper.new }
+
           # If a full stack id is provided, return it
-          return find_stack(*options) if unique_stack_id?(options)
+          return find_stack(*options) if stack_helper.unique_stack_id?(options)
 
           # Unfortunately the AWS SDK doesn't provide filters, so we have to
           # iterate through all the stacks
           stacks = resource.stacks.select do |stack|
-            selected?(stack, options)
+            stack_helper.selected?(stack, options)
           end
 
           [stacks].flatten
-        end
-
-        # List the {Aws::CloudFormation::Stack} properties that can be used
-        # to uniquely identify a stack
-        def self.unique_identifiers
-          [:stack_id, :stack_name]
-        end
-
-        # Indicates if a the {options} uniquely identify a stack
-        def self.unique_stack_id?(options)
-          unique_identifiers.any? do |identifier|
-            options.keys.include?(identifier) && options[identifier].is_a?(String)
-          end
-        end
-
-        # Indicates if a stack matches the criteria
-        def self.selected?(stack, options)
-          options.all? do |pair|
-            matches?(stack, pair.first, pair.last)
-          end
-        end
-
-        # Checks if a property matches the expected state
-        # Custom checks can be added by providing a check_{property name} method
-        def self.matches?(stack, property_name, value)
-          check_name = "check_#{property_name}"
-
-          # Perform a custom check if available
-          return send(check_name, value) if respond_to? check_name
-
-          # Otherwise do a regexp matching
-          stack.send(property_name).match(value).present?
         end
 
         # Find a single stack by its name or id
