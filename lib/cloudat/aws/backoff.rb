@@ -22,7 +22,7 @@ module Cloudat
         retry if max_retries > 0
 
         # Reraise the exception
-        raise exception, "Too many attempts"
+        raise e, "Too many attempts"
       end
     end
   end
