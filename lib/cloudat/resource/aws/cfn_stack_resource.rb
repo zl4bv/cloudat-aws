@@ -53,8 +53,11 @@ module Cloudat
 
           # Unfortunately the AWS SDK doesn't provide filters, so we have to
           # iterate through all the stacks
-          stacks = resource.stacks.select do |stack|
-            stack_helper.selected?(stack, options)
+          stacks = []
+          Cloudat::Aws.with_backoff do
+            stacks = resource.stacks.select do |stack|
+              stack_helper.selected?(stack, options)
+            end
           end
 
           [stacks].flatten
