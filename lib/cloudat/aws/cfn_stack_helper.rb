@@ -31,7 +31,7 @@ module Cloudat
         return send(check_name, value) if respond_to? check_name
 
         # Otherwise do a regexp matching
-        stack.send(property_name).match(value).present?
+        stack.send(property_name).match(value).present? if stack.respond_to? property_name
       end
     end
   end
